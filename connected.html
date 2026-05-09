@@ -350,7 +350,7 @@
       </div>
       <div class="titlebar-text">
         <h1>Koneksi Aktif</h1>
-        <p>tjkt.andrean.net</p>
+        <p>tjkt.keefa.net</p>
       </div>
       <div class="titlebar-controls">
         <div class="ctrl r"></div>
@@ -373,7 +373,7 @@
           <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         </div>
         <div class="user-info-text">
-          <div class="user-name" id="displayName">andrean</div>
+          <div class="user-name" id="displayName">keefa</div>
           <div class="user-profile">Profile: user hotspot 3M</div>
         </div>
         <div class="user-badge">Online</div>
@@ -400,7 +400,7 @@
             <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4 2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
             IP Address
           </div>
-          <div class="stat-card-value" style="font-size:13px;padding-top:3px;" id="ipVal">192.168.41.47</div>
+          <div class="stat-card-value" style="font-size:13px;padding-top:3px;" id="ipVal">192.168.17.47</div>
           <div class="stat-card-sub">ether3 / hotspot</div>
         </div>
         <div class="stat-card amber">
@@ -449,13 +449,13 @@
 
     <!-- footer -->
     <div class="card-footer">
-      <span class="footer-ip" id="footerIp">IP: 192.168.41.47</span>
+      <span class="footer-ip" id="footerIp">IP: 192.168.17.47</span>
       <span class="footer-brand"><span>Mikro</span>Tik RouterOS</span>
     </div>
   </div>
 
   <div class="domain-hint">
-    Jaringan hotspot &nbsp;·&nbsp; <a href="#">tjkt.andrean.net</a>
+    Jaringan hotspot &nbsp;·&nbsp; <a href="#">tjkt.keefa.net</a>
   </div>
 </div>
 
@@ -492,7 +492,7 @@
 
   // ── IP dari $(address) ──
   const rawIp = '$(address)';
-  const ip = rawIp.startsWith('$(') ? '192.168.41.xx' : rawIp;
+  const ip = rawIp.startsWith('$(') ? '192.168.17.xx' : rawIp;
   document.getElementById('ipVal').textContent = ip;
   document.getElementById('footerIp').textContent = `IP: ${ip}`;
 

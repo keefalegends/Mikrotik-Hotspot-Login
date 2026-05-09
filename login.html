@@ -436,7 +436,7 @@
       </div>
       <div class="titlebar-text">
         <h1>Hotspot Login</h1>
-        <p>tjkt.andrean.net</p>
+        <p>tjkt.keefa.net</p>
       </div>
       <div class="titlebar-controls">
         <div class="ctrl r"></div>
@@ -526,13 +526,13 @@
 
     <!-- footer -->
     <div class="card-footer">
-      <span class="footer-ip" id="clientIp">IP: 192.168.41.xxx</span>
+      <span class="footer-ip" id="clientIp">IP: 192.168.17.xxx</span>
       <span class="footer-brand"><span>Mikro</span>Tik RouterOS</span>
     </div>
   </div>
 
   <div class="domain-hint">
-    Jaringan hotspot &nbsp;·&nbsp; <a href="#">tjkt.andrean.net</a>
+    Jaringan hotspot &nbsp;·&nbsp; <a href="#">tjkt.keefa.net</a>
   </div>
 </div>
 
@@ -592,14 +592,14 @@
       // Sesuaikan dengan user yang dibuat di MikroTik
       const validUsers = [
         { name: 'admin',   pass: 'admin' },
-        { name: 'andrean', pass: 'andrean' },
+        { name: 'keefa', pass: 'keefa' },
       ];
 
       const ok = validUsers.find(u => u.name === user && u.pass === pass);
 
       if (ok) {
         // MikroTik hotspot redirect — ganti URL sesuai server
-        window.location.href = 'http://tjkt.andrean.net/login?username=' + encodeURIComponent(user) + '&password=' + encodeURIComponent(pass);
+        window.location.href = 'http://tjkt.keefa.net/login?username=' + encodeURIComponent(user) + '&password=' + encodeURIComponent(pass);
       } else {
         document.getElementById('errorText').textContent = 'Username atau password salah. Silakan coba lagi.';
         errDiv.classList.add('show');
