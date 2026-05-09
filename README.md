@@ -11,10 +11,10 @@ Tampilan halaman login dan status koneksi hotspot MikroTik dengan desain modern 
 
 ## 📸 Preview
 
-| Login Page | Status Page |
-|---|---|
-| `login.html` | `status.html` |
-| Form autentikasi user hotspot | Status sesi & total data terpakai |
+| Login Page | Status Page | Logout Page |
+|---|---|---|
+| `login.html` | `status.html` | `logout.html` |
+| Form autentikasi user hotspot | Status sesi & total data terpakai | Ringkasan sesi setelah koneksi diakhiri |
 
 ---
 
@@ -24,11 +24,11 @@ Tampilan halaman login dan status koneksi hotspot MikroTik dengan desain modern 
 /
 ├── login.html     # Halaman login hotspot
 ├── status.html    # Halaman status setelah login berhasil
+├── logout.html    # Halaman setelah user berhasil logout
 └── README.md
 ```
 
 > **Penamaan file wajib sesuai** agar dikenali RouterOS secara otomatis.
-> File `connected.html` dari repo ini harus di-rename menjadi `status.html` sebelum di-upload.
 
 ---
 
@@ -39,17 +39,22 @@ Tampilan halaman login dan status koneksi hotspot MikroTik dengan desain modern 
 - Input username & password dengan ikon
 - Toggle show/hide password
 - Loading spinner saat proses submit
-- Pesan error otomatis dari URL `?error=...` yang diinjeksi RouterOS
+- Pesan error `$(error)` langsung diinjeksi oleh RouterOS beserta auto-translate ke Bahasa Indonesia
 - Checkbox "Ingat saya"
 - Ripple effect pada tombol LOGIN
 
 ### `status.html`
 - Semua data real dari variabel template MikroTik
 - Timer sesi berjalan dari nilai `$(uptime)`
-- Bar progress total Download & Upload proporsional terhadap kuota
+- Bar progress total Download & Upload menggunakan `$(bytes-out)` & `$(bytes-in)` proporsional terhadap kuota
 - Sub-label persentase pemakaian data
 - 4 stat card: Durasi, IP Address, Share Users, Limit Speed
 - Tombol Logout ke endpoint `/logout` MikroTik
+
+### `logout.html`
+- Ringkasan sesi setelah pengguna melakukan logout
+- Menampilkan Durasi, IP Address, MAC Address, Total Download, dan Upload
+- Tombol untuk Login Kembali ke jaringan hotspot
 
 ### Desain
 - Dark theme konsisten bergaya Winbox
@@ -64,12 +69,7 @@ Tampilan halaman login dan status koneksi hotspot MikroTik dengan desain modern 
 
 ### 1. Persiapkan File
 
-Pastikan nama file sudah benar sebelum upload:
-
-| File di repo | Nama saat upload |
-|---|---|
-| `login.html` | `login.html` ✅ (tidak perlu rename) |
-| `connected.html` | `status.html` ⚠️ (wajib rename) |
+Pastikan file berikut sudah tersedia di direktori lokal kamu: `login.html`, `status.html`, dan `logout.html`.
 
 ### 2. Upload via Winbox (Drag & Drop)
 
@@ -77,7 +77,7 @@ Pastikan nama file sudah benar sebelum upload:
 2. Klik menu **Files** di sidebar kiri
 3. Cari dan buka folder **`hotspot`**
 4. Buka folder penyimpanan file di komputer kamu
-5. **Drag & Drop** `login.html` dan `status.html` ke dalam folder `hotspot` di jendela Winbox
+5. **Drag & Drop** `login.html`, `status.html`, dan `logout.html` ke dalam folder `hotspot` di jendela Winbox
 6. Jika muncul konfirmasi overwrite → pilih **Yes / Overwrite**
 
 ### 3. Cek HTML Directory
@@ -113,7 +113,7 @@ IP → Firewall → NAT → +
 **d. IP Address di Ether3**
 ```
 IP → Addresses → +
-  Address  : 192.168.41.1/24
+  Address  : 192.168.17.1/24
   Interface: ether3
 ```
 
@@ -126,13 +126,13 @@ IP → DHCP Server → DHCP Setup → ether3 → Next (sampai selesai)
 ```
 IP → Hotspot → Hotspot Setup
   Interface          : ether3
-  Local Address      : 192.168.41.1/24
+  Local Address      : 192.168.17.1/24
   ☑ Masquerade Network
-  Address Pool       : 192.168.41.2-192.168.41.254
+  Address Pool       : 192.168.17.2-192.168.17.254
   Certificate        : none
   SMTP Server        : 0.0.0.0
   DNS                : 8.8.8.8, 192.168.200.1
-  DNS Name           : tjkt.andrean.net
+  DNS Name           : tjkt.keefa.net
   Local Hotspot User : admin
   Password           : (isi password)
 ```
@@ -155,8 +155,8 @@ IP → Hotspot → User Profiles → +
 **i. Buat User**
 ```
 IP → Hotspot → Users → +
-  Name    : andrean
-  Password: andrean
+  Name    : keefa
+  Password: keefa
   Profile : user hotspot 3M
 ```
 
@@ -164,7 +164,7 @@ IP → Hotspot → Users → +
 
 Untuk preview halaman login tanpa harus logout dari jaringan, buka di browser:
 ```
-http://192.168.41.1/login
+http://192.168.17.1/login
 ```
 
 ---
@@ -177,12 +177,14 @@ RouterOS secara otomatis mengganti variabel berikut saat halaman dirender:
 |---|---|---|
 | `$(link-login-only)` | `login.html` | URL endpoint autentikasi hotspot |
 | `$(link-orig)` | `login.html` | URL tujuan asal sebelum redirect ke login |
-| `$(username)` | `status.html` | Nama user yang sedang login |
-| `$(address)` | `status.html` | IP address client |
-| `$(uptime)` | `status.html` | Durasi sesi aktif (format: `0d0h0m0s`) |
-| `$(rx-bytes)` | `status.html` | Total bytes diterima (download) |
-| `$(tx-bytes)` | `status.html` | Total bytes dikirim (upload) |
-| `$(mac)` | — | MAC address client |
+| `$(username)` | `status.html`, `logout.html` | Nama user yang sedang login |
+| `$(address)` | `status.html`, `logout.html` | IP address client |
+| `$(uptime)` | `status.html`, `logout.html` | Durasi sesi aktif (format: `0d0h0m0s`) |
+| `$(bytes-out)` | `status.html` | Total bytes dikirim dari router (download oleh client) |
+| `$(bytes-in)` | `status.html` | Total bytes diterima oleh router (upload dari client) |
+| `$(bytes-out-nice)`| `status.html`, `logout.html`| Total bytes download dengan format yang mudah dibaca |
+| `$(bytes-in-nice)`| `status.html`, `logout.html`| Total bytes upload dengan format yang mudah dibaca |
+| `$(mac)` | `logout.html` | MAC address client |
 | `$(session-time-left)` | — | Sisa waktu sesi |
 
 > Saat file dibuka langsung di browser (bukan via MikroTik), variabel `$(...)` belum dirender — ini normal. Tampilannya baru real setelah file masuk ke RouterOS.
@@ -203,7 +205,7 @@ const QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
 
 ### Ganti DNS Name
 
-Cari teks `tjkt.andrean.net` di kedua file dan ganti sesuai DNS Name yang kamu set di Hotspot Setup.
+Cari teks `tjkt.keefa.net` di semua file HTML dan ganti sesuai DNS Name yang kamu set di Hotspot Setup.
 
 ---
 
