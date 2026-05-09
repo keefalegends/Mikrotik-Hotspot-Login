@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MikroTik Hotspot Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --mt-bg:       #0d0f14;
+      --mt-panel:    #141820;
+      --mt-border:   #1e2535;
+      --mt-accent:   #e8a000;
+      --mt-accent2:  #ff6b00;
+      --mt-blue:     #1a9fef;
+      --mt-green:    #00c57a;
+      --mt-red:      #e84545;
+      --mt-text:     #c8d0e0;
+      --mt-muted:    #5a6478;
+      --mt-heading:  #ffffff;
+      --glow-amber:  0 0 18px rgba(232,160,0,.45);
+      --glow-blue:   0 0 18px rgba(26,159,239,.4);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Exo 2', sans-serif;
+      background: var(--mt-bg);
+      color: var(--mt-text);
+      overflow-x: hidden;
+    }
+
+    /* ── animated grid background ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(26,159,239,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,159,239,.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridDrift 30s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes gridDrift { to { background-position: 40px 40px; } }
+
+    /* ── radial spotlight ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -30%; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 700px;
+      background: radial-gradient(ellipse, rgba(232,160,0,.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrap {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ── top bar ── */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 42px;
+      background: rgba(14,16,22,.95);
+      border-bottom: 1px solid var(--mt-border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 12px;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+    .topbar-logo {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .topbar-logo svg { width: 22px; height: 22px; }
+    .topbar-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 1.5px;
+      color: var(--mt-accent);
+      text-transform: uppercase;
+    }
+    .topbar-sep { flex: 1; }
+    .topbar-status {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--mt-green);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--mt-green);
+      box-shadow: 0 0 6px var(--mt-green);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── main card ── */
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--mt-panel);
+      border: 1px solid var(--mt-border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(232,160,0,.08),
+        0 24px 64px rgba(0,0,0,.6),
+        inset 0 1px 0 rgba(255,255,255,.04);
+      animation: slideUp .5s cubic-bezier(.22,.68,0,1.2) both;
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(24px); } }
+
+    /* ── card title bar ── */
+    .card-titlebar {
+      background: linear-gradient(90deg, #1a1f2e 0%, #1e2535 100%);
+      border-bottom: 2px solid var(--mt-accent);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .titlebar-icon {
+      width: 32px; height: 32px;
+      border: 1.5px solid var(--mt-accent);
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(232,160,0,.08);
+      box-shadow: var(--glow-amber);
+      flex-shrink: 0;
+    }
+    .titlebar-icon svg { width: 18px; height: 18px; fill: var(--mt-accent); }
+    .titlebar-text h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 1.5px;
+      color: var(--mt-heading);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .titlebar-text p {
+      font-size: 11px;
+      color: var(--mt-muted);
+      margin-top: 3px;
+      font-family: 'Share Tech Mono', monospace;
+      letter-spacing: .5px;
+    }
+    .titlebar-controls {
+      margin-left: auto;
+      display: flex; gap: 6px;
+    }
+    .ctrl { width:12px;height:12px;border-radius:50%; }
+    .ctrl.r{background:#e84545;} .ctrl.y{background:#e8a000;} .ctrl.g{background:#00c57a;}
+
+    /* ── info banner ── */
+    .info-banner {
+      background: rgba(26,159,239,.08);
+      border-bottom: 1px solid rgba(26,159,239,.2);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .info-banner svg { width:14px;height:14px;fill:var(--mt-blue);flex-shrink:0; }
+    .info-banner span {
+      font-size: 11.5px;
+      color: var(--mt-blue);
+      font-family: 'Share Tech Mono', monospace;
+      letter-spacing: .3px;
+    }
+
+    /* ── body ── */
+    .card-body { padding: 24px 24px 20px; }
+
+    /* network stats row */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 22px;
+    }
+    .stat-box {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--mt-border);
+      border-radius: 3px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--mt-muted);
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .stat-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      color: var(--mt-accent);
+      margin-top: 3px;
+      font-weight: 700;
+    }
+
+    /* divider */
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 18px;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--mt-border); }
+    .divider-text {
+      font-size: 10px;
+      color: var(--mt-muted);
+      font-family: 'Rajdhani', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* form */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mt-muted);
+      margin-bottom: 6px;
+    }
+    .input-wrap {
+      position: relative;
+      display: flex; align-items: center;
+    }
+    .input-wrap svg {
+      position: absolute; left: 11px;
+      width: 15px; height: 15px;
+      fill: var(--mt-muted);
+      pointer-events: none;
+      transition: fill .2s;
+    }
+    .input-wrap input {
+      width: 100%;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--mt-border);
+      border-radius: 3px;
+      color: var(--mt-heading);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13.5px;
+      padding: 10px 40px 10px 36px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      letter-spacing: .5px;
+    }
+    .input-wrap input::placeholder { color: var(--mt-muted); font-size: 12px; }
+    .input-wrap input:focus {
+      border-color: var(--mt-accent);
+      background: rgba(232,160,0,.05);
+      box-shadow: var(--glow-amber);
+    }
+    .input-wrap input:focus + svg,
+    .input-wrap:focus-within svg { fill: var(--mt-accent); }
+
+    /* eye toggle */
+    .eye-btn {
+      position: absolute; right: 10px;
+      background: none; border: none;
+      cursor: pointer; padding: 4px;
+      display: flex; align-items: center;
+    }
+    .eye-btn svg { width: 15px; height: 15px; fill: var(--mt-muted); }
+    .eye-btn:hover svg { fill: var(--mt-text); }
+
+    /* remember row */
+    .remember-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .checkbox-wrap {
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+    }
+    .checkbox-wrap input[type=checkbox] { display: none; }
+    .custom-check {
+      width: 15px; height: 15px;
+      border: 1.5px solid var(--mt-border);
+      border-radius: 2px;
+      background: rgba(255,255,255,.03);
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .checkbox-wrap input[type=checkbox]:checked ~ .custom-check {
+      background: var(--mt-accent);
+      border-color: var(--mt-accent);
+      box-shadow: var(--glow-amber);
+    }
+    .custom-check svg { width: 9px; height: 9px; fill: #000; display: none; }
+    .checkbox-wrap input[type=checkbox]:checked ~ .custom-check svg { display: block; }
+    .checkbox-label { font-size: 12px; color: var(--mt-muted); }
+
+    /* login button */
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--mt-accent) 0%, var(--mt-accent2) 100%);
+      border: none;
+      border-radius: 3px;
+      color: #0d0f14;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 12px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: filter .2s, transform .1s;
+      box-shadow: 0 4px 20px rgba(232,160,0,.35);
+    }
+    .btn-login:hover { filter: brightness(1.1); }
+    .btn-login:active { transform: scale(.98); }
+    .btn-login .ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,.25);
+      transform: scale(0);
+      animation: rippleAnim .5s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+    /* spinner inside button */
+    .btn-login .spinner {
+      display: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,.3);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-login.loading .btn-text { display: none; }
+    .btn-login.loading .spinner { display: block; }
+
+    /* error message */
+    .error-msg {
+      display: none;
+      background: rgba(232,69,69,.1);
+      border: 1px solid rgba(232,69,69,.3);
+      border-radius: 3px;
+      color: var(--mt-red);
+      font-size: 12px;
+      font-family: 'Share Tech Mono', monospace;
+      padding: 8px 12px;
+      margin-top: 12px;
+      display: none;
+      align-items: center; gap: 8px;
+    }
+    .error-msg.show { display: flex; }
+    .error-msg svg { width: 13px; height: 13px; fill: var(--mt-red); flex-shrink: 0; }
+
+    /* ── footer ── */
+    .card-footer {
+      background: rgba(255,255,255,.02);
+      border-top: 1px solid var(--mt-border);
+      padding: 11px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-ip {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10.5px;
+      color: var(--mt-muted);
+    }
+    .footer-brand {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--mt-muted);
+      text-transform: uppercase;
+    }
+    .footer-brand span { color: var(--mt-accent); }
+
+    /* domain hint below card */
+    .domain-hint {
+      margin-top: 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--mt-muted);
+      text-align: center;
+      letter-spacing: .5px;
+    }
+    .domain-hint a { color: var(--mt-blue); text-decoration: none; }
+    .domain-hint a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- top bar -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <!-- RouterOS icon -->
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="5" width="20" height="14" rx="2" fill="#e8a000" opacity=".15" stroke="#e8a000" stroke-width="1.3"/>
+      <circle cx="6" cy="12" r="1.5" fill="#e8a000"/>
+      <circle cx="10" cy="12" r="1.5" fill="#e8a000" opacity=".5"/>
+      <circle cx="14" cy="12" r="1.5" fill="#e8a000" opacity=".25"/>
+      <rect x="17" y="9" width="3" height="6" rx="1" fill="#e8a000"/>
+    </svg>
+    <span class="topbar-title">MikroTik Hotspot</span>
+  </div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-status">
+    <div class="status-dot"></div>
+    ONLINE &nbsp;·&nbsp; RouterOS 7.x
+  </div>
+</div>
+
+<div class="page-wrap">
+  <div class="card" role="main">
+
+    <!-- title bar -->
+    <div class="card-titlebar">
+      <div class="titlebar-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C9.24 2 7 4.24 7 7c0 2.02 1.17 3.76 2.88 4.62L9.5 14h5l-.38-2.38A5.004 5.004 0 0 0 17 7c0-2.76-2.24-5-5-5zm0 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3zM8.5 16l-.5 2h8l-.5-2H8.5zm-.75 4-.25 2h9l-.25-2H7.75z"/>
+        </svg>
+      </div>
+      <div class="titlebar-text">
+        <h1>Hotspot Login</h1>
+        <p>tjkt.keefa.net</p>
+      </div>
+      <div class="titlebar-controls">
+        <div class="ctrl r"></div>
+        <div class="ctrl y"></div>
+        <div class="ctrl g"></div>
+      </div>
+    </div>
+
+    <!-- info banner -->
+    <div class="info-banner">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      <span>Masukkan kredensial untuk mengakses internet</span>
+    </div>
+
+    <div class="card-body">
+
+      <!-- network stats -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">Interface</div>
+          <div class="stat-value">Ether3</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Limit</div>
+          <div class="stat-value">3M/3M</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Status</div>
+          <div class="stat-value" style="color:var(--mt-green)">READY</div>
+        </div>
+      </div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">Autentikasi</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- form -->
+      <form id="loginForm" name="login" action="$(link-login-only)" method="post">
+
+        <!-- Hidden inputs wajib untuk MikroTik -->
+        <input type="hidden" name="dst" value="$(link-orig)" />
+        <input type="hidden" name="popup" value="true" />
+
+        <div class="field">
+          <div class="input-wrap">
+            <input type="text" id="username" name="username"
+              placeholder="Masukkan username" autocomplete="username" spellcheck="false" />
+            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap" id="pwWrap">
+            <input type="password" id="password" name="password"
+              placeholder="Masukkan password" autocomplete="current-password" />
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm3.1-9H8.9V6a3.1 3.1 0 0 1 6.2 0v2z"/></svg>
+            <button type="button" class="eye-btn" onclick="togglePw()" title="Tampilkan password">
+              <svg id="eyeIcon" viewBox="0 0 24 24">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="remember-row">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="remember" />
+            <div class="custom-check">
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <span class="checkbox-label">Ingat saya</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span class="btn-text">LOGIN</span>
+          <div class="spinner"></div>
+        </button>
+
+        <div class="error-msg" id="errorMsg">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span id="errorText">Username atau password salah. Silakan coba lagi.</span>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- footer -->
+    <div class="card-footer">
+      <span class="footer-ip" id="clientIp">IP: 192.168.17.xxx</span>
+      <span class="footer-brand"><span>Mikro</span>Tik RouterOS</span>
+    </div>
+  </div>
+
+  <div class="domain-hint">
+    Jaringan hotspot &nbsp;·&nbsp; <a href="#">tjkt.keefa.net</a>
+  </div>
+</div>
+
+<script>
+  // ── ripple + loading state saat submit ──
+  document.querySelector('.btn-login').addEventListener('click', function(e) {
+    const btn = this;
+    // ripple
+    const r = document.createElement('span');
+    r.classList.add('ripple');
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    btn.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+    // loading spinner
+    setTimeout(() => btn.classList.add('loading'), 80);
+  });
+
+  // ── toggle password visibility ──
+  let pwVisible = false;
+  function togglePw() {
+    pwVisible = !pwVisible;
+    const inp = document.getElementById('password');
+    const ico = document.getElementById('eyeIcon');
+    inp.type = pwVisible ? 'text' : 'password';
+    ico.innerHTML = pwVisible
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-5 0-9.27-3.11-11-7.5a17.7 17.7 0 0 1 2.27-4.07M9.9 4.24A9.12 9.12 0 0 1 12 4c5 0 9.27 3.11 11 7.5a17.8 17.8 0 0 1-1.24 2.46M1 1l22 22M8.59 8.59A5 5 0 0 0 12 17a5 5 0 0 0 3.41-1.41"/>'
+      : '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>';
+  }
+
+  // ── tampilkan error dari MikroTik ──
+  // RouterOS menambahkan ?error=... di URL jika login gagal
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('error')) {
+    const errDiv  = document.getElementById('errorMsg');
+    const errText = document.getElementById('errorText');
+    const messages = {
+      'invalid-username':  'Username tidak ditemukan.',
+      'invalid-password':  'Password salah.',
+      'user-session-limit':'Akun sedang digunakan di perangkat lain.',
+      'uptime-limit':      'Waktu sesi habis.',
+      'traffic-limit':     'Kuota data habis.',
+    };
+    errText.textContent = messages[params.get('error')] || 'Login gagal. Silakan coba lagi.';
+    errDiv.classList.add('show');
+  }
+</script>
+</body>
+</html>
