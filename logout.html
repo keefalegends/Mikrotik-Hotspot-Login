@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connected — MikroTik Hotspot</title>
+  <title>Logged Out — MikroTik Hotspot</title>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,6 +23,7 @@
       --glow-amber: 0 0 18px rgba(232,160,0,.45);
       --glow-green: 0 0 18px rgba(0,197,122,.4);
       --glow-blue:  0 0 18px rgba(26,159,239,.4);
+      --glow-red:   0 0 18px rgba(232,69,69,.4);
     }
 
     html, body { height: 100%; font-family: 'Exo 2', sans-serif; background: var(--mt-bg); color: var(--mt-text); overflow-x: hidden; }
@@ -43,7 +44,7 @@
       content: '';
       position: fixed; top: -30%; left: 50%; transform: translateX(-50%);
       width: 900px; height: 700px;
-      background: radial-gradient(ellipse, rgba(0,197,122,.06) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(232,69,69,.06) 0%, transparent 70%);
       pointer-events: none; z-index: 0;
     }
 
@@ -65,14 +66,12 @@
     .topbar-sep { flex: 1; }
     .topbar-status {
       font-family: 'Share Tech Mono', monospace; font-size: 11px;
-      color: var(--mt-green); display: flex; align-items: center; gap: 6px;
+      color: var(--mt-muted); display: flex; align-items: center; gap: 6px;
     }
     .status-dot {
       width: 6px; height: 6px; border-radius: 50%;
-      background: var(--mt-green); box-shadow: 0 0 6px var(--mt-green);
-      animation: blink 2s ease-in-out infinite;
+      background: var(--mt-muted); box-shadow: 0 0 6px var(--mt-muted);
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* ── page ── */
     .page-wrap {
@@ -90,7 +89,7 @@
       border-radius: 4px;
       overflow: hidden;
       box-shadow:
-        0 0 0 1px rgba(0,197,122,.08),
+        0 0 0 1px rgba(232,69,69,.08),
         0 24px 64px rgba(0,0,0,.6),
         inset 0 1px 0 rgba(255,255,255,.04);
       animation: slideUp .5s cubic-bezier(.22,.68,0,1.2) both;
@@ -100,18 +99,18 @@
     /* ── title bar ── */
     .card-titlebar {
       background: linear-gradient(90deg, #1a1f2e 0%, #1e2535 100%);
-      border-bottom: 2px solid var(--mt-green);
+      border-bottom: 2px solid var(--mt-red);
       padding: 12px 16px;
       display: flex; align-items: center; gap: 10px;
     }
     .titlebar-icon {
       width: 32px; height: 32px;
-      border: 1.5px solid var(--mt-green); border-radius: 3px;
+      border: 1.5px solid var(--mt-red); border-radius: 3px;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(0,197,122,.08);
-      box-shadow: var(--glow-green); flex-shrink: 0;
+      background: rgba(232,69,69,.08);
+      box-shadow: var(--glow-red); flex-shrink: 0;
     }
-    .titlebar-icon svg { width: 18px; height: 18px; fill: var(--mt-green); }
+    .titlebar-icon svg { width: 18px; height: 18px; fill: var(--mt-red); }
     .titlebar-text h1 {
       font-family: 'Rajdhani', sans-serif; font-weight: 700;
       font-size: 16px; letter-spacing: 1.5px;
@@ -125,16 +124,16 @@
     .ctrl { width:12px;height:12px;border-radius:50%; }
     .ctrl.r{background:#e84545;} .ctrl.y{background:#e8a000;} .ctrl.g{background:#00c57a;}
 
-    /* ── success banner ── */
-    .success-banner {
-      background: rgba(0,197,122,.08);
-      border-bottom: 1px solid rgba(0,197,122,.2);
+    /* ── info banner ── */
+    .info-banner {
+      background: rgba(232,69,69,.08);
+      border-bottom: 1px solid rgba(232,69,69,.2);
       padding: 10px 16px;
       display: flex; align-items: center; gap: 8px;
     }
-    .success-banner svg { width:14px;height:14px;fill:var(--mt-green);flex-shrink:0; }
-    .success-banner span {
-      font-size: 11.5px; color: var(--mt-green);
+    .info-banner svg { width:14px;height:14px;fill:var(--mt-red);flex-shrink:0; }
+    .info-banner span {
+      font-size: 11.5px; color: var(--mt-red);
       font-family: 'Share Tech Mono', monospace; letter-spacing: .3px;
     }
 
@@ -171,13 +170,13 @@
       color: var(--mt-muted); margin-top: 2px;
     }
     .user-badge {
-      background: rgba(0,197,122,.15);
-      border: 1px solid rgba(0,197,122,.35);
+      background: rgba(232,69,69,.15);
+      border: 1px solid rgba(232,69,69,.35);
       border-radius: 2px;
       padding: 3px 8px;
       font-family: 'Rajdhani', sans-serif; font-weight: 700;
       font-size: 11px; letter-spacing: 1px;
-      color: var(--mt-green); text-transform: uppercase;
+      color: var(--mt-red); text-transform: uppercase;
       white-space: nowrap;
     }
 
@@ -229,7 +228,7 @@
 
     .stat-card-value {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 18px; font-weight: 700;
+      font-size: 16px; font-weight: 700;
       margin-top: 6px; line-height: 1;
     }
     .stat-card.green .stat-card-value { color: var(--mt-green); }
@@ -242,55 +241,26 @@
       font-size: 10px; color: var(--mt-muted); margin-top: 4px;
     }
 
-    /* speed bar */
-    .speed-row { margin-bottom: 18px; }
-    .speed-label-row {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 6px;
-    }
-    .speed-label {
-      font-family: 'Rajdhani', sans-serif; font-weight: 600;
-      font-size: 10px; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--mt-muted);
-    }
-    .speed-value {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px; color: var(--mt-text);
-    }
-    .speed-track {
-      height: 5px; background: rgba(255,255,255,.06);
-      border-radius: 99px; overflow: hidden;
-    }
-    .speed-fill {
-      height: 100%; border-radius: 99px;
-      animation: fillBar .8s cubic-bezier(.22,.68,0,1.2) both;
-    }
-    @keyframes fillBar { from { width: 0 !important; } }
-    .speed-sub {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px; color: var(--mt-muted);
-      margin-top: 4px; text-align: right;
-    }
-
-    /* logout button */
-    .btn-logout {
+    /* login button */
+    .btn-login {
       width: 100%;
-      background: transparent;
-      border: 1.5px solid var(--mt-red);
+      background: linear-gradient(135deg, var(--mt-accent) 0%, var(--mt-accent2) 100%);
+      border: none;
       border-radius: 3px;
-      color: var(--mt-red);
+      color: #0d0f14;
       font-family: 'Rajdhani', sans-serif; font-weight: 700;
-      font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
-      padding: 11px; cursor: pointer;
-      transition: background .2s, box-shadow .2s, transform .1s;
+      font-size: 15px; letter-spacing: 3px; text-transform: uppercase;
+      padding: 12px; cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: filter .2s, transform .1s;
+      box-shadow: 0 4px 20px rgba(232,160,0,.35);
       display: flex; align-items: center; justify-content: center; gap: 8px;
+      text-decoration: none;
+      margin-top: 20px;
     }
-    .btn-logout svg { width: 15px; height: 15px; fill: var(--mt-red); }
-    .btn-logout:hover {
-      background: rgba(232,69,69,.1);
-      box-shadow: 0 0 16px rgba(232,69,69,.3);
-    }
-    .btn-logout:active { transform: scale(.98); }
+    .btn-login svg { width: 18px; height: 18px; fill: #0d0f14; }
+    .btn-login:hover { filter: brightness(1.1); }
+    .btn-login:active { transform: scale(.98); }
 
     /* footer */
     .card-footer {
@@ -336,7 +306,7 @@
   <div class="topbar-sep"></div>
   <div class="topbar-status">
     <div class="status-dot"></div>
-    CONNECTED &nbsp;·&nbsp; RouterOS 7.x
+    DISCONNECTED &nbsp;·&nbsp; RouterOS 7.x
   </div>
 </div>
 
@@ -346,10 +316,10 @@
     <!-- title bar -->
     <div class="card-titlebar">
       <div class="titlebar-icon">
-        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4 2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
       </div>
       <div class="titlebar-text">
-        <h1>Koneksi Aktif</h1>
+        <h1>Sesi Berakhir</h1>
         <p>tjkt.keefa.net</p>
       </div>
       <div class="titlebar-controls">
@@ -359,10 +329,10 @@
       </div>
     </div>
 
-    <!-- success banner -->
-    <div class="success-banner">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
-      <span>Autentikasi berhasil — internet aktif</span>
+    <!-- info banner -->
+    <div class="info-banner">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      <span>Anda telah keluar dari jaringan hotspot</span>
     </div>
 
     <div class="card-body">
@@ -373,15 +343,15 @@
           <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         </div>
         <div class="user-info-text">
-          <div class="user-name" id="displayName">keefa</div>
-          <div class="user-profile">Profile: user hotspot 3M</div>
+          <div class="user-name" id="displayName">$(username)</div>
+          <div class="user-profile">MAC: $(mac)</div>
         </div>
-        <div class="user-badge">Online</div>
+        <div class="user-badge">Offline</div>
       </div>
 
       <div class="divider">
         <div class="divider-line"></div>
-        <div class="divider-text">Statistik Sesi</div>
+        <div class="divider-text">Ringkasan Sesi</div>
         <div class="divider-line"></div>
       </div>
 
@@ -390,66 +360,48 @@
         <div class="stat-card green">
           <div class="stat-card-label">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-            Durasi
+            Waktu Aktif
           </div>
-          <div class="stat-card-value" id="timerVal">00:00:00</div>
-          <div class="stat-card-sub">sejak login</div>
+          <div class="stat-card-value" id="uptimeVal">$(uptime)</div>
+          <div class="stat-card-sub">durasi sesi</div>
         </div>
         <div class="stat-card blue">
           <div class="stat-card-label">
             <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4 2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
             IP Address
           </div>
-          <div class="stat-card-value" style="font-size:13px;padding-top:3px;" id="ipVal">192.168.17.47</div>
+          <div class="stat-card-value" style="font-size:13px;padding-top:3px;" id="ipVal">$(address)</div>
           <div class="stat-card-sub">ether3 / hotspot</div>
         </div>
         <div class="stat-card amber">
           <div class="stat-card-label">
-            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-            Share Users
+            <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+            Download
           </div>
-          <div class="stat-card-value">1 / 1</div>
-          <div class="stat-card-sub">slot terpakai</div>
+          <div class="stat-card-value" id="dlVal">$(bytes-out-nice)</div>
+          <div class="stat-card-sub">total rx</div>
         </div>
-        <div class="stat-card green" style="--mt-green:#00c57a">
-          <div class="stat-card-label">
-            <svg viewBox="0 0 24 24" style="fill:var(--mt-green)"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
-            Limit Speed
+        <div class="stat-card amber" style="--mt-accent:#00c57a">
+          <div class="stat-card-label" style="color:var(--mt-green)">
+            <svg viewBox="0 0 24 24" style="fill:var(--mt-green)"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+            Upload
           </div>
-          <div class="stat-card-value" style="font-size:15px;padding-top:3px;">3M / 3M</div>
-          <div class="stat-card-sub">rx / tx Mbps</div>
+          <div class="stat-card-value" style="color:var(--mt-green)" id="ulVal">$(bytes-in-nice)</div>
+          <div class="stat-card-sub">total tx</div>
         </div>
       </div>
 
-      <!-- data usage bars -->
-      <div class="speed-row">
-        <div class="speed-label-row">
-          <span class="speed-label">↓ Total Download</span>
-          <span class="speed-value" id="dlVal">$(bytes-out-nice)</span>
-        </div>
-        <div class="speed-track"><div class="speed-fill dl" id="dlBar" style="width:0%"></div></div>
-        <div class="speed-sub" id="dlSub"></div>
-      </div>
-      <div class="speed-row" style="margin-bottom:20px">
-        <div class="speed-label-row">
-          <span class="speed-label">↑ Total Upload</span>
-          <span class="speed-value" id="ulVal">$(bytes-in-nice)</span>
-        </div>
-        <div class="speed-track"><div class="speed-fill ul" id="ulBar" style="width:0%"></div></div>
-        <div class="speed-sub" id="ulSub"></div>
-      </div>
-
-      <!-- logout -->
-      <button class="btn-logout" onclick="handleLogout()">
-        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-        Logout
-      </button>
+      <!-- login again -->
+      <a href="$(link-login)" class="btn-login">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        Login Kembali
+      </a>
 
     </div>
 
     <!-- footer -->
     <div class="card-footer">
-      <span class="footer-ip" id="footerIp">IP: 192.168.17.47</span>
+      <span class="footer-ip" id="footerIp">IP: $(address)</span>
       <span class="footer-brand"><span>Mikro</span>Tik RouterOS</span>
     </div>
   </div>
@@ -460,87 +412,15 @@
 </div>
 
 <script>
-  // ── session timer dari $(uptime) ──
-  // MikroTik inject $(uptime) dalam format "0d0h0m0s"
-  // Kita parse lalu jalankan counter dari nilai itu
-  function parseUptime(str) {
-    // format MikroTik: "1d2h3m4s" atau "2h3m4s" atau "3m4s" dst
-    let total = 0;
-    const d = str.match(/(\d+)d/); if(d) total += parseInt(d[1]) * 86400;
-    const h = str.match(/(\d+)h/); if(h) total += parseInt(h[1]) * 3600;
-    const m = str.match(/(\d+)m/); if(m) total += parseInt(m[1]) * 60;
-    const s = str.match(/(\d+)s/); if(s) total += parseInt(s[1]);
-    return total;
-  }
-  function pad(n){ return String(n).padStart(2,'0'); }
-  function formatSeconds(sec) {
-    const h = Math.floor(sec/3600);
-    const m = Math.floor((sec%3600)/60);
-    const s = sec%60;
-    return `${pad(h)}:${pad(m)}:${pad(s)}`;
-  }
-
-  // Nilai uptime dari MikroTik — saat deploy, $(uptime) diganti RouterOS
-  // Fallback ke "0s" saat preview di browser biasa
-  const rawUptime = '$(uptime)';
-  let seconds = rawUptime.startsWith('$(') ? 0 : parseUptime(rawUptime);
-  document.getElementById('timerVal').textContent = formatSeconds(seconds);
-  setInterval(() => {
-    seconds++;
-    document.getElementById('timerVal').textContent = formatSeconds(seconds);
-  }, 1000);
-
-  // ── IP dari $(address) ──
-  const rawIp = '$(address)';
-  const ip = rawIp.startsWith('$(') ? '192.168.17.xx' : rawIp;
-  document.getElementById('ipVal').textContent = ip;
-  document.getElementById('footerIp').textContent = `IP: ${ip}`;
-
-  // ── Username dari $(username) ──
-  const rawUser = '$(username)';
-  if (!rawUser.startsWith('$(')) {
-    document.getElementById('displayName').textContent = rawUser;
-  }
-
-  // ── Total bytes dari $(rx-bytes) & $(tx-bytes) ──
-  // MikroTik inject nilai dalam satuan bytes (angka bulat)
-  function formatBytes(raw) {
-    // Jika belum di-deploy (masih template literal), return placeholder
-    if (typeof raw === 'string' && raw.startsWith('$(')) return { text: '— B', bytes: 0 };
-    const b = parseInt(raw) || 0;
-    if (b < 1024)            return { text: b + ' B',                      bytes: b };
-    if (b < 1024*1024)       return { text: (b/1024).toFixed(1) + ' KB',   bytes: b };
-    if (b < 1024*1024*1024)  return { text: (b/1024/1024).toFixed(2) + ' MB', bytes: b };
-    return                          { text: (b/1024/1024/1024).toFixed(2) + ' GB', bytes: b };
-  }
-
-  // Quota maksimum untuk bar (default 1 GB; sesuaikan jika ada batas data)
-  const QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
-
-  const rxRaw = '$(bytes-out)';
-  const txRaw = '$(bytes-in)';
-
-  const rx = formatBytes(rxRaw);
-  const tx = formatBytes(txRaw);
-
-  document.getElementById('dlVal').textContent = rx.text;
-  document.getElementById('ulVal').textContent = tx.text;
-
-  // bar width proporsional terhadap QUOTA_BYTES (max 100%)
-  const dlPct = Math.min(rx.bytes / QUOTA_BYTES * 100, 100);
-  const ulPct = Math.min(tx.bytes / QUOTA_BYTES * 100, 100);
-  document.getElementById('dlBar').style.width = (dlPct || 0) + '%';
-  document.getElementById('ulBar').style.width = (ulPct || 0) + '%';
-
-  // sub-label persentase pemakaian
-  document.getElementById('dlSub').textContent = dlPct ? dlPct.toFixed(1) + '% dari 1 GB' : '';
-  document.getElementById('ulSub').textContent = ulPct ? ulPct.toFixed(1) + '% dari 1 GB' : '';
-
-  // ── logout ──
-  function handleLogout(){
-    if(confirm('Yakin ingin logout dari hotspot?')){
-      window.location.href = '/logout';
-    }
+  // Script untuk fallback jika dijalankan secara lokal (bukan oleh router)
+  const username = '$(username)';
+  if (username.startsWith('$(')) {
+    document.getElementById('displayName').textContent = 'keefa';
+    document.getElementById('uptimeVal').textContent = '01:23:45';
+    document.getElementById('ipVal').textContent = '192.168.17.47';
+    document.getElementById('dlVal').textContent = '150.2 MB';
+    document.getElementById('ulVal').textContent = '12.5 MB';
+    document.getElementById('footerIp').textContent = 'IP: 192.168.17.47';
   }
 </script>
 </body>
