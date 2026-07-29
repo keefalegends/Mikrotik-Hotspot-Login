@@ -41,7 +41,7 @@ Tampilan halaman login dan status koneksi hotspot MikroTik dengan desain modern 
 - Loading spinner saat proses submit
 - Pesan error `$(error)` langsung diinjeksi oleh RouterOS beserta auto-translate ke Bahasa Indonesia
 - Checkbox "Ingat saya"
-- Ripple effect pada tombol LOGIN
+- Ripple effect pada tombol login
 
 ### `status.html`
 - Semua data real dari variabel template MikroTik
