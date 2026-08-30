@@ -1,6 +1,6 @@
 # 🌐 MikroTik Hotspot Login Page - Jarkom
 
-Tampilan halaman login dan status koneksi hotspot MikroTik dengan desain modern dark theme bergaya Winbox/RouterOS. Dibuat dengan HTML, CSS, dan JavaScript murni — tanpa framework, tanpa dependensi eksternal selain Google Fonts.
+Tampilan halaman login dan status koneksi hotspot MikroTik dengan desain modern dark theme bergaya Winbox/RouterOS. Dibuat dengan HTML, CSS, dan JavaScript murni — tanpa framework. 
 
 ![RouterOS](https://img.shields.io/badge/RouterOS-7.x-orange?style=flat-square&logo=mikrotik)
 ![HTML](https://img.shields.io/badge/HTML-5-red?style=flat-square&logo=html5&logoColor=white)
